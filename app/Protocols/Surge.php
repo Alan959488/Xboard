@@ -39,7 +39,8 @@ class Surge implements ProtocolInterface
                     'aes-128-gcm',
                     'aes-192-gcm',
                     'aes-256-gcm',
-                    'chacha20-ietf-poly1305'
+                    'chacha20-ietf-poly1305',
+                    '2022-blake3-aes-128-gcm'
                 ])
             ) {
                 $proxies .= self::buildShadowsocks($item['password'], $item);
@@ -103,8 +104,9 @@ class Surge implements ProtocolInterface
             "{$server['port']}",
             "encrypt-method={$protocol_settings['cipher']}",
             "password={$password}",
-            'tfo=true',
-            'udp-relay=true'
+            'tfo=false',
+            'udp-relay=true',
+            'block-quic=on'
         ];
         $config = array_filter($config);
         $uri = implode(',', $config);
@@ -164,7 +166,7 @@ class Surge implements ProtocolInterface
             'udp-relay=true'
         ];
         if (!empty($protocol_settings['allow_insecure'])) {
-            array_push($config, !!data_get($protocol_settings, 'allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false');
+            array_push($config, $protocol_settings['allow_insecure'] ? 'skip-cert-verify=true' : 'skip-cert-verify=false');
         }
         $config = array_filter($config);
         $uri = implode(',', $config);
@@ -189,7 +191,7 @@ class Surge implements ProtocolInterface
             'udp-relay=true'
         ];
         if (data_get($protocol_settings, 'tls.allow_insecure')) {
-            $config[] = !!data_get($protocol_settings, 'tls.allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false';
+            $config[] = data_get($protocol_settings, 'tls.allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false';
         }
         $config = array_filter($config);
         $uri = implode(',', $config);
