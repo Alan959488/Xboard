@@ -147,6 +147,20 @@ class ClashMeta implements ProtocolInterface
         $array['cipher'] = data_get($server['protocol_settings'], 'cipher');
         $array['password'] = data_get($server, 'password', $password);
         $array['udp'] = true;
+        
+        // 检查节点名称是否包含tls，如果包含则添加tls相关配置
+        if (stripos($server['name'], 'tls') !== false) {
+            $array['plugin'] = 'shadow-tls';
+            $array['client-fingerprint'] = 'chrome';
+            $array['plugin-opts'] = [
+                'host' => 'icloud.com',
+                'password' => 'ixejvmdGp0fuIBkg4M2Diw==',
+                'version' => 3
+            ];
+            // 去掉udp设置
+            unset($array['udp']);
+        }
+        
         return $array;
     }
 
