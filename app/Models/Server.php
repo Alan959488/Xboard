@@ -155,7 +155,8 @@ class Server extends Model
                 'fields' => [
                     'version' => ['type' => 'integer', 'default' => 3],
                     'password' => ['type' => 'string', 'default' => null],
-                    'sni' => ['type' => 'string', 'default' => null]
+                    'sni' => ['type' => 'string', 'default' => null],
+                    'fingerprint' => ['type' => 'string', 'default' => 'chrome']
                 ]
             ]
         ],

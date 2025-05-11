@@ -151,7 +151,7 @@ class ClashMeta implements ProtocolInterface
         // 检查是否启用ShadowTLS
         if (data_get($server['protocol_settings'], 'shadow_tls', false)) {
             $array['plugin'] = 'shadow-tls';
-            $array['client-fingerprint'] = 'chrome';
+            $array['client-fingerprint'] = data_get($server['protocol_settings'], 'shadow_tls_settings.fingerprint', 'chrome');
             $array['plugin-opts'] = [
                 'host' => data_get($server['protocol_settings'], 'shadow_tls_settings.sni', 'icloud.com'),
                 'password' => data_get($server['protocol_settings'], 'shadow_tls_settings.password', ''),

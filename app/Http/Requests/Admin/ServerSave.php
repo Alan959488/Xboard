@@ -18,6 +18,7 @@ class ServerSave extends FormRequest
             'shadow_tls_settings.version' => 'nullable|integer',
             'shadow_tls_settings.password' => 'nullable|string',
             'shadow_tls_settings.sni' => 'nullable|string',
+            'shadow_tls_settings.fingerprint' => 'nullable|string',
         ],
         'vmess' => [
             'tls' => 'required|integer',
