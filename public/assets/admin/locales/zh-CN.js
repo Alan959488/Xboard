@@ -1588,7 +1588,7 @@ window.XBOARD_TRANSLATIONS['zh-CN'] = {
         },
         "shadow_tls_settings": {
           "version": {
-            "label": "版本",
+            "label": "版本号",
             "placeholder": "选择ShadowTLS版本"
           },
           "password": {
