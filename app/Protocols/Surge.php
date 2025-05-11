@@ -108,7 +108,7 @@ class Surge implements ProtocolInterface
             'udp-relay=true',
             'block-quic=on'
         ];
-        
+
         // 检查是否启用ShadowTLS
         if (data_get($protocol_settings, 'shadow_tls', false)) {
             $version = data_get($protocol_settings, 'shadow_tls_settings.version', 3);
