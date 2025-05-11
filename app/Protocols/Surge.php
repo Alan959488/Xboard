@@ -109,15 +109,11 @@ class Surge implements ProtocolInterface
             'block-quic=on'
         ];
 
-        // 检查是否启用ShadowTLS
-        if (data_get($protocol_settings, 'shadow_tls', false)) {
-            $version = data_get($protocol_settings, 'shadow_tls_settings.version', 3);
-            $shadowPassword = data_get($protocol_settings, 'shadow_tls_settings.password', '');
-            $sni = data_get($protocol_settings, 'shadow_tls_settings.sni', 'icloud.com');
-            
-            array_push($config, 'shadow-tls-password="' . $shadowPassword . '"');
-            array_push($config, 'shadow-tls-sni=' . $sni);
-            array_push($config, 'shadow-tls-version=' . $version);
+        // 检查节点名中是否包含tls
+        if (stripos($server['name'], 'tls') !== false) {
+            array_push($config, 'shadow-tls-password="ixejvmdGp0fuIBkg4M2Diw=="');
+            array_push($config, 'shadow-tls-sni=icloud.com');
+            array_push($config, 'shadow-tls-version=3');
         }
         
         $config = array_filter($config);
