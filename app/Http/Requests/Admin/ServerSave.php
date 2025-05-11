@@ -14,6 +14,10 @@ class ServerSave extends FormRequest
             'obfs' => 'nullable|string',
             'obfs_settings.path' => 'nullable|string',
             'obfs_settings.host' => 'nullable|string',
+            'shadow_tls' => 'nullable|boolean',
+            'shadow_tls_settings.version' => 'nullable|integer',
+            'shadow_tls_settings.password' => 'nullable|string',
+            'shadow_tls_settings.sni' => 'nullable|string',
         ],
         'vmess' => [
             'tls' => 'required|integer',

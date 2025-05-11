@@ -148,14 +148,14 @@ class ClashMeta implements ProtocolInterface
         $array['password'] = data_get($server, 'password', $password);
         $array['udp'] = true;
         
-        // 检查节点名称是否包含tls，如果包含则添加tls相关配置
-        if (stripos($server['name'], 'tls') !== false) {
+        // 检查是否启用ShadowTLS
+        if (data_get($server['protocol_settings'], 'shadow_tls', false)) {
             $array['plugin'] = 'shadow-tls';
             $array['client-fingerprint'] = 'chrome';
             $array['plugin-opts'] = [
-                'host' => 'icloud.com',
-                'password' => 'ixejvmdGp0fuIBkg4M2Diw==',
-                'version' => 3
+                'host' => data_get($server['protocol_settings'], 'shadow_tls_settings.sni', 'icloud.com'),
+                'password' => data_get($server['protocol_settings'], 'shadow_tls_settings.password', ''),
+                'version' => data_get($server['protocol_settings'], 'shadow_tls_settings.version', 3)
             ];
             // 去掉udp设置
             unset($array['udp']);

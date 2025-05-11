@@ -1613,6 +1613,27 @@ window.XBOARD_TRANSLATIONS['en-US'] = {
         "obfs_settings": {
           "path": "Path",
           "host": "Host"
+        },
+        "shadow_tls": {
+          "label": "ShadowTLS",
+          "enabled": "Enabled",
+          "disabled": "Disabled"
+        },
+        "shadow_tls_settings": {
+          "version": {
+            "label": "Version",
+            "placeholder": "Select ShadowTLS version"
+          },
+          "password": {
+            "label": "Password",
+            "placeholder": "Enter ShadowTLS password",
+            "generate": "Generate Password",
+            "generate_success": "Password generated successfully"
+          },
+          "sni": {
+            "label": "Server Name Indication (SNI)",
+            "placeholder": "E.g., www.example.com"
+          }
         }
       },
       "vmess": {

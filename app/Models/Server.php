@@ -148,7 +148,16 @@ class Server extends Model
         self::TYPE_SHADOWSOCKS => [
             'cipher' => ['type' => 'string', 'default' => null],
             'obfs' => ['type' => 'string', 'default' => null],
-            'obfs_settings' => ['type' => 'array', 'default' => null]
+            'obfs_settings' => ['type' => 'array', 'default' => null],
+            'shadow_tls' => ['type' => 'boolean', 'default' => false],
+            'shadow_tls_settings' => [
+                'type' => 'object',
+                'fields' => [
+                    'version' => ['type' => 'integer', 'default' => 3],
+                    'password' => ['type' => 'string', 'default' => null],
+                    'sni' => ['type' => 'string', 'default' => null]
+                ]
+            ]
         ],
         self::TYPE_HYSTERIA => [
             'version' => ['type' => 'integer', 'default' => 2],

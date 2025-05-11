@@ -1580,6 +1580,27 @@ window.XBOARD_TRANSLATIONS['zh-CN'] = {
         "obfs_settings": {
           "path": "路径",
           "host": "Host"
+        },
+        "shadow_tls": {
+          "label": "ShadowTLS",
+          "enabled": "启用",
+          "disabled": "禁用"
+        },
+        "shadow_tls_settings": {
+          "version": {
+            "label": "版本",
+            "placeholder": "选择ShadowTLS版本"
+          },
+          "password": {
+            "label": "密码",
+            "placeholder": "请输入ShadowTLS密码",
+            "generate": "生成密码",
+            "generate_success": "密码生成成功"
+          },
+          "sni": {
+            "label": "服务器名称指示(SNI)",
+            "placeholder": "例如：www.example.com"
+          }
         }
       },
       "vmess": {

@@ -108,6 +108,18 @@ class Surge implements ProtocolInterface
             'udp-relay=true',
             'block-quic=on'
         ];
+        
+        // 检查是否启用ShadowTLS
+        if (data_get($protocol_settings, 'shadow_tls', false)) {
+            $version = data_get($protocol_settings, 'shadow_tls_settings.version', 3);
+            $shadowPassword = data_get($protocol_settings, 'shadow_tls_settings.password', '');
+            $sni = data_get($protocol_settings, 'shadow_tls_settings.sni', 'icloud.com');
+            
+            array_push($config, 'shadow-tls-password="' . $shadowPassword . '"');
+            array_push($config, 'shadow-tls-sni=' . $sni);
+            array_push($config, 'shadow-tls-version=' . $version);
+        }
+        
         $config = array_filter($config);
         $uri = implode(',', $config);
         $uri .= "\r\n";

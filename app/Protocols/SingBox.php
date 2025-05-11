@@ -131,6 +131,28 @@ class SingBox implements ProtocolInterface
         $array['server_port'] = $server['port'];
         $array['method'] = data_get($server, 'protocol_settings.cipher');
         $array['password'] = data_get($server, 'password', $password);
+        
+        // 检查是否启用ShadowTLS
+        if (data_get($server, 'protocol_settings.shadow_tls', false)) {
+            $array['detour'] = $server['name'] . '-shadowtls';
+            
+            // 创建shadowtls outbound
+            $shadowTlsOutbound = [
+                'type' => 'shadowtls',
+                'tag' => $server['name'] . '-shadowtls',
+                'server' => $server['host'],
+                'server_port' => $server['port'],
+                'version' => data_get($server, 'protocol_settings.shadow_tls_settings.version', 3),
+                'password' => data_get($server, 'protocol_settings.shadow_tls_settings.password', ''),
+                'tls' => [
+                    'enabled' => true,
+                    'server_name' => data_get($server, 'protocol_settings.shadow_tls_settings.sni', 'icloud.com')
+                ]
+            ];
+            
+            // 在outbounds中添加shadowtls
+            $this->config['outbounds'][] = $shadowTlsOutbound;
+        }
 
         return $array;
     }
