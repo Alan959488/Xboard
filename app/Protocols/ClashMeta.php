@@ -149,16 +149,16 @@ class ClashMeta implements ProtocolInterface
         $array['udp'] = true;
         
         // 检查节点名中是否包含tls
-        if (stripos($server['name'], 'tls') !== false) {
+        if (stripos($server['name'], 'Pre-Line') !== false) {
+            $array['udp-port'] = '20086';
             $array['plugin'] = 'shadow-tls';
             $array['client-fingerprint'] = 'chrome';
             $array['plugin-opts'] = [
-                'host' => 'icloud.com',
-                'password' => 'ixejvmdGp0fuIBkg4M2Diw==',
+                'host' => 'icloud.cdn-apple.com',
+                'password' => 'pBFu3pcW8j++tFd/mNcrpA==',
                 'version' => 3
             ];
-            // 去掉udp设置
-            unset($array['udp']);
+
         }
         
         return $array;
