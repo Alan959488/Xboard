@@ -13,11 +13,7 @@ class ClashMeta implements ProtocolInterface
     private $servers;
     private $user;
 
-    /**
-     * @param mixed $user 用户实例
-     * @param array $servers 服务器列表
-     */
-    public function __construct($user, $servers)
+    public function __construct($user, $servers, array $options = null)
     {
         $this->user = $user;
         $this->servers = $servers;
@@ -82,18 +78,6 @@ class ClashMeta implements ProtocolInterface
                 array_push($proxy, self::buildTuic($user['uuid'], $item));
                 array_push($proxies, $item['name']);
             }
-            if ($item['type'] === 'socks') {
-                array_push($proxy, self::buildSocks5($user['uuid'], $item));
-                array_push($proxies, $item['name']);
-            }
-            if ($item['type'] === 'http') {
-                array_push($proxy, self::buildHttp($user['uuid'], $item));
-                array_push($proxies, $item['name']);
-            }
-            if ($item['type'] === 'mieru') {
-                array_push($proxy, self::buildMieru($user['uuid'], $item));
-                array_push($proxies, $item['name']);
-            }
         }
 
         $config['proxies'] = array_merge($config['proxies'] ? $config['proxies'] : [], $proxy);
@@ -137,11 +121,11 @@ class ClashMeta implements ProtocolInterface
      */
     public function buildRules($config)
     {
-        // Force the current subscription domain to be a direct rule
-        $subsDomain = request()->header('Host');
-        if ($subsDomain) {
-            array_unshift($config['rules'], "DOMAIN,{$subsDomain},DIRECT");
-        }
+        // // Force the current subscription domain to be a direct rule
+        // $subsDomain = request()->header('Host');
+        // if ($subsDomain) {
+        //     array_unshift($config['rules'], "DOMAIN,{$subsDomain},DIRECT");
+        // }
         // // Force the nodes ip to be a direct rule
         // collect($this->servers)->pluck('host')->map(function ($host) {
         //     $host = trim($host);
@@ -163,6 +147,20 @@ class ClashMeta implements ProtocolInterface
         $array['cipher'] = data_get($server['protocol_settings'], 'cipher');
         $array['password'] = data_get($server, 'password', $password);
         $array['udp'] = true;
+        
+        // 检查节点名中是否包含tls
+        if (stripos($server['name'], 'Pre-Line') !== false) {
+            $array['udp-port'] = '20086';
+            $array['plugin'] = 'shadow-tls';
+            $array['client-fingerprint'] = 'chrome';
+            $array['plugin-opts'] = [
+                'host' => 'icloud.cdn-apple.com',
+                'password' => 'pBFu3pcW8j++tFd/mNcrpA==',
+                'version' => 3
+            ];
+
+        }
+        
         return $array;
     }
 
@@ -192,7 +190,7 @@ class ClashMeta implements ProtocolInterface
                 if (data_get($protocol_settings, 'network_settings.header.type', 'none') !== 'none') {
                     $array['http-opts'] = [
                         'headers' => data_get($protocol_settings, 'network_settings.header.request.headers'),
-                        'path' => \Illuminate\Support\Arr::random(data_get($protocol_settings, 'network_settings.header.request.path', ['/']))
+                        'path' => \Arr::random(data_get($protocol_settings, 'network_settings.header.request.path', ['/']))
                     ];
                 }
                 break;
@@ -224,8 +222,6 @@ class ClashMeta implements ProtocolInterface
             'server' => $server['host'],
             'port' => $server['port'],
             'uuid' => $password,
-            'alterId' => 0,
-            'cipher' => 'auto',
             'udp' => true,
             'flow' => data_get($protocol_settings, 'flow'),
             'tls' => false
@@ -241,13 +237,13 @@ class ClashMeta implements ProtocolInterface
                 break;
             case 2:
                 $array['tls'] = true;
-                $array['skip-cert-verify'] = (bool) data_get($protocol_settings, 'reality_settings.allow_insecure', false);
                 $array['servername'] = data_get($protocol_settings, 'reality_settings.server_name');
                 $array['reality-opts'] = [
                     'public-key' => data_get($protocol_settings, 'reality_settings.public_key'),
                     'short-id' => data_get($protocol_settings, 'reality_settings.short_id')
                 ];
-                $array['client-fingerprint'] = Helper::getRandFingerprint();
+                $array['client-fingerprint'] = 'chrome';
+                $array['network'] = 'tcp';
                 break;
             default:
                 break;
@@ -385,78 +381,9 @@ class ClashMeta implements ProtocolInterface
         return $array;
     }
 
-    public static function buildMieru($password, $server)
-    {
-        $protocol_settings = data_get($server, 'protocol_settings', []);
-        $array = [
-            'name' => $server['name'],
-            'type' => 'mieru',
-            'server' => $server['host'],
-            'port' => $server['port'],
-            'username' => $password,
-            'password' => $password,
-            'transport' => strtoupper(data_get($protocol_settings, 'transport', 'TCP')),
-            'multiplexing' => data_get($protocol_settings, 'multiplexing', 'MULTIPLEXING_LOW')
-        ];
-
-        // 如果配置了端口范围
-        if (isset($server['ports'])) {
-            $array['port-range'] = $server['ports'];
-        }
-
-        return $array;
-    }
-
-    public static function buildSocks5($password, $server)
-    {
-        $protocol_settings = $server['protocol_settings'];
-        $array = [];
-        $array['name'] = $server['name'];
-        $array['type'] = 'socks5';
-        $array['server'] = $server['host'];
-        $array['port'] = $server['port'];
-        $array['udp'] = true;
-
-        $array['username'] = $password;
-        $array['password'] = $password;
-
-        // TLS 配置
-        if (data_get($protocol_settings, 'tls')) {
-            $array['tls'] = true;
-            $array['skip-cert-verify'] = (bool) data_get($protocol_settings, 'tls_settings.allow_insecure', false);
-        }
-
-        return $array;
-    }
-
-    public static function buildHttp($password, $server)
-    {
-        $protocol_settings = $server['protocol_settings'];
-        $array = [];
-        $array['name'] = $server['name'];
-        $array['type'] = 'http';
-        $array['server'] = $server['host'];
-        $array['port'] = $server['port'];
-
-        $array['username'] = $password;
-        $array['password'] = $password;
-
-        // TLS 配置
-        if (data_get($protocol_settings, 'tls')) {
-            $array['tls'] = true;
-            $array['skip-cert-verify'] = (bool) data_get($protocol_settings, 'tls_settings.allow_insecure', false);
-        }
-
-        return $array;
-    }
-
     private function isMatch($exp, $str)
     {
-        try {
-            return preg_match($exp, $str) === 1;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return @preg_match($exp, $str);
     }
 
     private function isRegex($exp)
@@ -464,10 +391,6 @@ class ClashMeta implements ProtocolInterface
         if (empty($exp)) {
             return false;
         }
-        try {
-            return preg_match($exp, '') !== false;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return @preg_match($exp, '') !== false;
     }
 }
