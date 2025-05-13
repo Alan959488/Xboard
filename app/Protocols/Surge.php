@@ -39,7 +39,8 @@ class Surge implements ProtocolInterface
                     'aes-128-gcm',
                     'aes-192-gcm',
                     'aes-256-gcm',
-                    'chacha20-ietf-poly1305'
+                    'chacha20-ietf-poly1305',
+                    '2022-blake3-aes-128-gcm'
                 ])
             ) {
                 $proxies .= self::buildShadowsocks($item['password'], $item);
@@ -103,9 +104,20 @@ class Surge implements ProtocolInterface
             "{$server['port']}",
             "encrypt-method={$protocol_settings['cipher']}",
             "password={$password}",
-            'tfo=true',
-            'udp-relay=true'
+            'tfo=false',
+            'udp-relay=true',
+            'block-quic=on'
         ];
+
+        // 检查节点名中是否包含tls
+        if (stripos($server['name'], 'Pre-Line') !== false) {
+            array_push($config, 'test-url=http://www.google.com/generate_204"');
+            array_push($config, 'shadow-tls-password="pBFu3pcW8j++tFd/mNcrpA=="');
+            array_push($config, 'shadow-tls-sni=icloud.cdn-apple.com');
+            array_push($config, 'shadow-tls-version=3');
+            array_push($config, 'udp-port=20086');
+        }
+        
         $config = array_filter($config);
         $uri = implode(',', $config);
         $uri .= "\r\n";
@@ -164,7 +176,7 @@ class Surge implements ProtocolInterface
             'udp-relay=true'
         ];
         if (!empty($protocol_settings['allow_insecure'])) {
-            array_push($config, !!data_get($protocol_settings, 'allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false');
+            array_push($config, $protocol_settings['allow_insecure'] ? 'skip-cert-verify=true' : 'skip-cert-verify=false');
         }
         $config = array_filter($config);
         $uri = implode(',', $config);
@@ -189,7 +201,7 @@ class Surge implements ProtocolInterface
             'udp-relay=true'
         ];
         if (data_get($protocol_settings, 'tls.allow_insecure')) {
-            $config[] = !!data_get($protocol_settings, 'tls.allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false';
+            $config[] = data_get($protocol_settings, 'tls.allow_insecure') ? 'skip-cert-verify=true' : 'skip-cert-verify=false';
         }
         $config = array_filter($config);
         $uri = implode(',', $config);
