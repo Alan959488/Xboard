@@ -111,7 +111,7 @@ class Surge implements ProtocolInterface
 
         // 检查节点名中是否包含tls
         if (stripos($server['name'], 'Pre-Line') !== false) {
-            array_push($config, 'test-url=http://www.google.com/generate_204"');
+            array_push($config, 'test-url=http://www.google.com/generate_204');
             array_push($config, 'shadow-tls-password="pBFu3pcW8j++tFd/mNcrpA=="');
             array_push($config, 'shadow-tls-sni=icloud.cdn-apple.com');
             array_push($config, 'shadow-tls-version=3');
